@@ -70,6 +70,8 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   const meta = JSON.parse(metaRaw)
   const targetDir = meta.target_directory
 
+  core.info(`meta: ${meta}`)
+
   const profile = options.debug ? 'debug' : 'release'
   const bundleDir = options.target
     ? join(targetDir, options.target, profile, 'bundle')
@@ -91,11 +93,22 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'msi.zip.sig'
   ]
 
- const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
-    ...macOSExts,
-    linuxExts,
-    windowsExts
-  ].join(',')}}`
+  const androidExts = ['apk']
+
+  let artifactsLookupPattern: string = ''
+  if (!options.mobile) {
+    artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
+      ...macOSExts,
+      linuxExts,
+      windowsExts
+    ].join(',')}}`
+  }
+
+  if (options.mobile === 'android') {
+    artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
+      ...androidExts
+    ].join(',')}}`
+  }
 
   core.debug(
     `Looking for artifacts using this pattern: ${artifactsLookupPattern}`
