@@ -5,7 +5,9 @@ color: 'blue'
 author: 'Tauri Programme within The Commons Conservancy'
 inputs:
   runner:
-    description: 'Binary to use to build the application'
+    description: 'Binary to use to build desktop application'
+  mobile:
+    description: 'Binary to use to build mobile application'  
   args:
     description: 'Additional arguments for the build command'
   projectPath:
