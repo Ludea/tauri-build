@@ -43,7 +43,8 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   if (options.runner && !options.mobile) {
     core.info(`running ${options.runner} with args: build ${args.join(' ')}`)
     await spawnCmd(options.runner, ['build', ...args])
-  } else if (!options.mobile) {
+  }
+  if (!options.mobile) {
     core.info(`running builtin runner with args: build ${args.join(' ')}`)
     await run(['build', ...args], '')
   }

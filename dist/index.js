@@ -69,7 +69,7 @@ function buildProject(options) {
             core.info(`running ${options.runner} with args: build ${args.join(' ')}`);
             yield spawnCmd(options.runner, ['build', ...args]);
         }
-        else if (!options.mobile) {
+        if (!options.mobile) {
             core.info(`running builtin runner with args: build ${args.join(' ')}`);
             yield (0, cli_1.run)(['build', ...args], '');
         }
