@@ -13,6 +13,7 @@ interface BuildOptions {
   runner?: string
   projectPath?: string
   configPath?: string
+  mobile?: string
   debug?: boolean
   args?: string[]
   target?: string
@@ -39,12 +40,23 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     process.chdir(newCwd)
   }
 
-  if (options.runner) {
+  if (options.runner && !options.mobile) {
     core.info(`running ${options.runner} with args: build ${args.join(' ')}`)
     await spawnCmd(options.runner, ['build', ...args])
-  } else {
+  } else if (!options.mobile) {
     core.info(`running builtin runner with args: build ${args.join(' ')}`)
     await run(['build', ...args], '')
+  }
+
+  if (options.mobile === 'android') {
+    core.info(
+      `running android runner with args: android build ${args.join(' ')}`
+    )
+    await run(['android', 'build', ...args], '')
+  }
+  if (options.mobile === 'ios') {
+    core.info(`running ios runner with args: ios build ${args.join(' ')}`)
+    await run(['ios', 'build', ...args], '')
   }
 
   const crateDir = await glob(`./**/Cargo.toml`).then(([manifest]) =>
@@ -79,7 +91,7 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'msi.zip.sig'
   ]
 
-  const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
+ const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
     ...macOSExts,
     linuxExts,
     windowsExts
