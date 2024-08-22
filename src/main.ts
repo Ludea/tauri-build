@@ -9,6 +9,7 @@ async function run(): Promise<void> {
       args: stringArgv(core.getInput('args')),
       projectPath: core.getInput('projectPath'),
       configPath: core.getInput('configPath'),
+      mobile: core.getInput('mobile'),
       target: core.getInput('target'),
       debug: core.getBooleanInput('debug')
     })

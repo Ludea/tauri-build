@@ -234,6 +234,7 @@ function run() {
                 args: (0, string_argv_1.default)(core.getInput('args')),
                 projectPath: core.getInput('projectPath'),
                 configPath: core.getInput('configPath'),
+                mobile: core.getInput('mobile'),
                 target: core.getInput('target'),
                 debug: core.getBooleanInput('debug')
             });
