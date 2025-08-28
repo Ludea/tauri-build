@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "${{ github.event.pusher.email }}"
       - uses: actions/setup-node@v4.4.0
         with:
-          node-version: 20
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
       - uses: pnpm/action-setup@v4.1.0
         name: Install pnpm
