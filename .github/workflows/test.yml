@@ -30,12 +30,16 @@ jobs:
       matrix:
         include:
           - platform: ubuntu-latest
+            host: ubuntu_x86_64
             rust_target: x86_64-unknown-linux-gnu
           - platform: macos-latest
+            host: macos_x86_64
             rust_target: x86_64-apple-darwin
           - platform: macos-latest
+            host: macos_aarch64
             rust_target: aarch64-apple-darwin
           - platform: windows-latest
+            host: windows_x86_64
             rust_target: x86_64-pc-windows-msvc
 
     runs-on: ${{ matrix.platform }}
@@ -74,5 +78,5 @@ jobs:
       # The artifacts output can now be used to upload the artifacts
       - uses: actions/upload-artifact@v3
         with:
-          name: artifacts
+          name: artifacts-${{ matrix.host }}
           path: "${{ join(fromJSON(steps.tauri_build.outputs.artifacts), '\n') }}"
