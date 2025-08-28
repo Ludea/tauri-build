@@ -68,7 +68,8 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'AppImage',
     'AppImage.tar.gz',
     'AppImage.tar.gz.sig',
-    'deb'
+    'deb',
+    'rpm'
   ]
   const windowsExts = ['exe', 'exe.zip', 'exe.zip.sig', 'msi', 'msi.zip', 'msi.zip.sig']
 
