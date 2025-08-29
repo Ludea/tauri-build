@@ -71,7 +71,14 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'deb',
     'rpm'
   ]
-  const windowsExts = ['exe', 'exe.zip', 'exe.zip.sig', 'msi', 'msi.zip', 'msi.zip.sig']
+  const windowsExts = [
+    'exe',
+    'exe.zip',
+    'exe.zip.sig',
+    'msi',
+    'msi.zip',
+    'msi.zip.sig'
+  ]
 
   const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
     ...macOSExts,

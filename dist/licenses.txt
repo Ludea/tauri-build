@@ -263,19 +263,19 @@ Apache-2.0 OR MIT
 
 
 @tauri-apps/cli-darwin-arm64
-MIT
+Apache-2.0 OR MIT
 
 @tauri-apps/cli-darwin-x64
-MIT
+Apache-2.0 OR MIT
 
 @tauri-apps/cli-linux-x64-gnu
-MIT
+Apache-2.0 OR MIT
 
 @tauri-apps/cli-linux-x64-musl
-MIT
+Apache-2.0 OR MIT
 
 @tauri-apps/cli-win32-x64-msvc
-MIT
+Apache-2.0 OR MIT
 
 @vercel/ncc
 MIT
