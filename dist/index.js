@@ -89,8 +89,10 @@ const child_process_1 = __nccwpck_require__(5317);
 function buildProject(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const args = options.args || [];
-        const android = (process.platform === 'linux' && options.mobile === 'true') || options.mobile === 'android';
-        const ios = process.platform === 'darwin' && (options.mobile === 'true' || options.mobile === 'ios');
+        const android = (process.platform === 'linux' && options.mobile === 'true') ||
+            options.mobile === 'android';
+        const ios = process.platform === 'darwin' &&
+            (options.mobile === 'true' || options.mobile === 'ios');
         if (options.debug) {
             args.push('--debug');
         }
@@ -100,19 +102,19 @@ function buildProject(options) {
         if (options.target) {
             args.push('--target', options.target);
         }
+        if (android) {
+            args.push('--apk');
+            args.push('--split-per-abi');
+        }
         if (options.projectPath) {
             const newCwd = (0, path_1.resolve)(process.cwd(), options.projectPath);
             core.debug(`changing working directory: ${process.cwd()} -> ${newCwd}`);
             process.chdir(newCwd);
         }
         if (options.runner) {
-            core.info(`running ${options.runner} with args: build ${args.join(' ')}`);
+            core.info(`running ${options.runner} with args: android ${args.join(' ')}`);
             yield spawnCmd(options.runner, [
-                android
-                    ? 'android build --apk --target aarch64 --split-per-abi'
-                    : ios
-                        ? 'ios build'
-                        : 'build',
+                android ? 'android build' : ios ? 'ios build' : 'build',
                 ...args
             ]);
         }

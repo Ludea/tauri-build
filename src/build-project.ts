@@ -23,9 +23,11 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   const args: string[] = options.args || []
 
   const android =
-    (process.platform === 'linux' && options.mobile === 'true') || options.mobile === 'android'
+    (process.platform === 'linux' && options.mobile === 'true') ||
+    options.mobile === 'android'
   const ios =
-    process.platform === 'darwin' && (options.mobile === 'true' || options.mobile === 'ios')
+    process.platform === 'darwin' &&
+    (options.mobile === 'true' || options.mobile === 'ios')
 
   if (options.debug) {
     args.push('--debug')
@@ -39,6 +41,11 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     args.push('--target', options.target)
   }
 
+  if (android) {
+    args.push('--apk')
+    args.push('--split-per-abi')
+  }
+
   if (options.projectPath) {
     const newCwd = resolve(process.cwd(), options.projectPath)
     core.debug(`changing working directory: ${process.cwd()} -> ${newCwd}`)
@@ -46,13 +53,9 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   }
 
   if (options.runner) {
-    core.info(`running ${options.runner} with args: build ${args.join(' ')}`)
+    core.info(`running ${options.runner} with args: android ${args.join(' ')}`)
     await spawnCmd(options.runner, [
-      android
-        ? 'android build --apk --target aarch64 --split-per-abi'
-        : ios
-          ? 'ios build'
-          : 'build',
+      android ? 'android build' : ios ? 'ios build' : 'build',
       ...args
     ])
   } else {
