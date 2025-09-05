@@ -10,6 +10,7 @@ async function run(): Promise<void> {
       projectPath: core.getInput('projectPath'),
       configPath: core.getInput('configPath'),
       target: core.getInput('target'),
+      mobile: core.getInput('mobile'),
       debug: core.getBooleanInput('debug')
     })
 

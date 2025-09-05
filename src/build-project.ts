@@ -14,12 +14,18 @@ interface BuildOptions {
   projectPath?: string
   configPath?: string
   debug?: boolean
+  mobile?: string
   args?: string[]
   target?: string
 }
 
 export async function buildProject(options: BuildOptions): Promise<string[]> {
   const args: string[] = options.args || []
+
+  const android =
+    (process.platform === 'linux' && options.mobile === 'true') || options.mobile === 'android'
+  const ios =
+    process.platform === 'darwin' && (options.mobile === 'true' || options.mobile === 'ios')
 
   if (options.debug) {
     args.push('--debug')
@@ -41,10 +47,27 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
 
   if (options.runner) {
     core.info(`running ${options.runner} with args: build ${args.join(' ')}`)
-    await spawnCmd(options.runner, ['build', ...args])
+    await spawnCmd(options.runner, [
+      android
+        ? 'android build --apk --target aarch64 --split-per-abi'
+        : ios
+          ? 'ios build'
+          : 'build',
+      ...args
+    ])
   } else {
     core.info(`running builtin runner with args: build ${args.join(' ')}`)
-    await run(['build', ...args], '')
+    await run(
+      [
+        android
+          ? 'android build --apk --target aarch64 --split-per-abi'
+          : ios
+            ? 'ios build'
+            : 'build',
+        ...args
+      ],
+      ''
+    )
   }
 
   const crateDir = await glob(`./**/Cargo.toml`).then(([manifest]) =>
@@ -57,12 +80,23 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   )
   const meta = JSON.parse(metaRaw)
   const targetDir = meta.target_directory
+  const workspaceRoot = meta.workspace_root
 
   const profile = options.debug ? 'debug' : 'release'
-  const bundleDir = options.target
+  const desktopBundleDir = options.target
     ? join(targetDir, options.target, profile, 'bundle')
     : join(targetDir, profile, 'bundle')
-
+  const mobileBundleDir = join(
+    workspaceRoot,
+    'gen',
+    android ? 'android' : ios ? 'ios' : '',
+    'app',
+    'build',
+    'outputs',
+    'apk',
+    'arm64',
+    profile
+  )
   const macOSExts = ['app', 'app.tar.gz', 'app.tar.gz.sig', 'dmg']
   const linuxExts = [
     'AppImage',
@@ -71,6 +105,7 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'deb',
     'rpm'
   ]
+  const androidExts = ['apk']
   const windowsExts = [
     'exe',
     'exe.zip',
@@ -80,7 +115,7 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'msi.zip.sig'
   ]
 
-  const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
+  const artifactsLookupPattern = `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
     ...macOSExts,
     linuxExts,
     windowsExts
