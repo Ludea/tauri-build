@@ -12,6 +12,8 @@ inputs:
     description: 'Path to the root of the project'
   configPath:
     description: 'Path to the tauri.conf.json file if you want a configuration different from the default one'
+  mobile:
+    description: "Enable mobile build (Android / IOS)"
   target:
     description: 'The target triple to build against'
   debug:

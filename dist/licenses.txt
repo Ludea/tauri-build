@@ -271,9 +271,6 @@ Apache-2.0 OR MIT
 @tauri-apps/cli-linux-x64-gnu
 Apache-2.0 OR MIT
 
-@tauri-apps/cli-linux-x64-musl
-Apache-2.0 OR MIT
-
 @tauri-apps/cli-win32-x64-msvc
 Apache-2.0 OR MIT
 

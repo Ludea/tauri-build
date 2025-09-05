@@ -22,13 +22,6 @@ module.exports = require(__nccwpck_require__.ab + "cli.linux-x64-gnu.node")
 
 /***/ }),
 
-/***/ 7603:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-module.exports = require(__nccwpck_require__.ab + "cli.linux-x64-musl.node")
-
-/***/ }),
-
 /***/ 3810:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -96,6 +89,8 @@ const child_process_1 = __nccwpck_require__(5317);
 function buildProject(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const args = options.args || [];
+        const android = (process.platform === 'linux' && options.mobile === 'true') || options.mobile === 'android';
+        const ios = process.platform === 'darwin' && (options.mobile === 'true' || options.mobile === 'ios');
         if (options.debug) {
             args.push('--debug');
         }
@@ -112,20 +107,36 @@ function buildProject(options) {
         }
         if (options.runner) {
             core.info(`running ${options.runner} with args: build ${args.join(' ')}`);
-            yield spawnCmd(options.runner, ['build', ...args]);
+            yield spawnCmd(options.runner, [
+                android
+                    ? 'android build --apk --target aarch64 --split-per-abi'
+                    : ios
+                        ? 'ios build'
+                        : 'build',
+                ...args
+            ]);
         }
         else {
             core.info(`running builtin runner with args: build ${args.join(' ')}`);
-            yield (0, cli_1.run)(['build', ...args], '');
+            yield (0, cli_1.run)([
+                android
+                    ? 'android build --apk --target aarch64 --split-per-abi'
+                    : ios
+                        ? 'ios build'
+                        : 'build',
+                ...args
+            ], '');
         }
         const crateDir = yield (0, tiny_glob_1.default)(`./**/Cargo.toml`).then(([manifest]) => (0, path_1.join)(process.cwd(), (0, path_1.dirname)(manifest)));
         const metaRaw = yield execCmd('cargo', ['metadata', '--no-deps', '--format-version', '1'], { cwd: crateDir });
         const meta = JSON.parse(metaRaw);
         const targetDir = meta.target_directory;
+        const workspaceRoot = meta.workspace_root;
         const profile = options.debug ? 'debug' : 'release';
-        const bundleDir = options.target
+        const desktopBundleDir = options.target
             ? (0, path_1.join)(targetDir, options.target, profile, 'bundle')
             : (0, path_1.join)(targetDir, profile, 'bundle');
+        const mobileBundleDir = (0, path_1.join)(workspaceRoot, 'gen', android ? 'android' : ios ? 'ios' : '', 'app', 'build', 'outputs', 'apk', 'arm64', profile);
         const macOSExts = ['app', 'app.tar.gz', 'app.tar.gz.sig', 'dmg'];
         const linuxExts = [
             'AppImage',
@@ -134,6 +145,7 @@ function buildProject(options) {
             'deb',
             'rpm'
         ];
+        const androidExts = ['apk'];
         const windowsExts = [
             'exe',
             'exe.zip',
@@ -142,7 +154,7 @@ function buildProject(options) {
             'msi.zip',
             'msi.zip.sig'
         ];
-        const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
+        const artifactsLookupPattern = `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
             ...macOSExts,
             linuxExts,
             windowsExts
@@ -272,6 +284,7 @@ function run() {
                 projectPath: core.getInput('projectPath'),
                 configPath: core.getInput('configPath'),
                 target: core.getInput('target'),
+                mobile: core.getInput('mobile'),
                 debug: core.getBooleanInput('debug')
             });
             core.setOutput('artifacts', JSON.stringify(artifacts));
@@ -3694,7 +3707,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return __nccwpck_require__(7603)
+          return __nccwpck_require__(1290)
         } catch (e) {
           loadErrors.push(e)
         }
@@ -27143,6 +27156,14 @@ module.exports = eval("require")("@tauri-apps/cli-linux-riscv64-musl");
 /***/ ((module) => {
 
 module.exports = eval("require")("@tauri-apps/cli-linux-s390x-gnu");
+
+
+/***/ }),
+
+/***/ 1290:
+/***/ ((module) => {
+
+module.exports = eval("require")("@tauri-apps/cli-linux-x64-musl");
 
 
 /***/ }),
