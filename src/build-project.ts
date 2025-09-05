@@ -55,7 +55,8 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   if (options.runner) {
     core.info(`running ${options.runner} with args: android ${args.join(' ')}`)
     await spawnCmd(options.runner, [
-      android ? 'android build' : ios ? 'ios build' : 'build',
+      android ? 'android' : ios ? 'ios' : '',
+      'build',
       ...args
     ])
   } else {

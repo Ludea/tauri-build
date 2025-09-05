@@ -114,7 +114,8 @@ function buildProject(options) {
         if (options.runner) {
             core.info(`running ${options.runner} with args: android ${args.join(' ')}`);
             yield spawnCmd(options.runner, [
-                android ? 'android build' : ios ? 'ios build' : 'build',
+                android ? 'android' : ios ? 'ios' : '',
+                'build',
                 ...args
             ]);
         }
