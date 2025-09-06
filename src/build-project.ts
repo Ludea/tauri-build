@@ -55,13 +55,22 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   if (options.runner) {
     core.info(`running ${options.runner} with args: android ${args.join(' ')}`)
     await spawnCmd(options.runner, [
-      android ? 'android' : ios ? 'ios' : '',
+      ...(android ? ['android'] : []),
+      ...(ios ? ['ios'] : []),
       'build',
       ...args
     ])
   } else {
     core.info(`running builtin runner with args: android ${args.join(' ')}`)
-    await run([android ? 'android' : ios ? 'ios' : '', 'build', ...args], '')
+    await run(
+      [
+        ...(android ? ['android'] : []),
+        ...(ios ? ['ios'] : []),
+        'build',
+        ...args
+      ],
+      ''
+    )
   }
 
   const crateDir = await glob(`./**/Cargo.toml`).then(([manifest]) =>

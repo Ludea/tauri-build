@@ -114,14 +114,20 @@ function buildProject(options) {
         if (options.runner) {
             core.info(`running ${options.runner} with args: android ${args.join(' ')}`);
             yield spawnCmd(options.runner, [
-                android ? 'android' : ios ? 'ios' : '',
+                ...(android ? ['android'] : []),
+                ...(ios ? ['ios'] : []),
                 'build',
                 ...args
             ]);
         }
         else {
             core.info(`running builtin runner with args: android ${args.join(' ')}`);
-            yield (0, cli_1.run)([android ? 'android' : ios ? 'ios' : '', 'build', ...args], '');
+            yield (0, cli_1.run)([
+                ...(android ? ['android'] : []),
+                ...(ios ? ['ios'] : []),
+                'build',
+                ...args
+            ], '');
         }
         const crateDir = yield (0, tiny_glob_1.default)(`./**/Cargo.toml`).then(([manifest]) => (0, path_1.join)(process.cwd(), (0, path_1.dirname)(manifest)));
         const metaRaw = yield execCmd('cargo', ['metadata', '--no-deps', '--format-version', '1'], { cwd: crateDir });
