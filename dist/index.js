@@ -120,15 +120,8 @@ function buildProject(options) {
             ]);
         }
         else {
-            core.info(`running builtin runner with args: build ${args.join(' ')}`);
-            yield (0, cli_1.run)([
-                android
-                    ? 'android build --apk --target aarch64 --split-per-abi'
-                    : ios
-                        ? 'ios build'
-                        : 'build',
-                ...args
-            ], '');
+            core.info(`running builtin runner with args: android ${args.join(' ')}`);
+            yield (0, cli_1.run)([android ? 'android' : ios ? 'ios' : '', 'build', ...args], '');
         }
         const crateDir = yield (0, tiny_glob_1.default)(`./**/Cargo.toml`).then(([manifest]) => (0, path_1.join)(process.cwd(), (0, path_1.dirname)(manifest)));
         const metaRaw = yield execCmd('cargo', ['metadata', '--no-deps', '--format-version', '1'], { cwd: crateDir });
