@@ -60,18 +60,8 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
       ...args
     ])
   } else {
-    core.info(`running builtin runner with args: build ${args.join(' ')}`)
-    await run(
-      [
-        android
-          ? 'android build --apk --target aarch64 --split-per-abi'
-          : ios
-            ? 'ios build'
-            : 'build',
-        ...args
-      ],
-      ''
-    )
+    core.info(`running builtin runner with args: android ${args.join(' ')}`)
+    await run([android ? 'android' : ios ? 'ios' : '', 'build', ...args], '')
   }
 
   const crateDir = await glob(`./**/Cargo.toml`).then(([manifest]) =>
