@@ -138,7 +138,7 @@ function buildProject(options) {
         const desktopBundleDir = options.target
             ? (0, path_1.join)(targetDir, options.target, profile, 'bundle')
             : (0, path_1.join)(targetDir, profile, 'bundle');
-        const mobileBundleDir = (0, path_1.join)(workspaceRoot, 'gen', android ? 'android' : ios ? 'ios' : '', 'app', 'build', 'outputs', 'apk', 'arm64', profile);
+        const mobileBundleDir = (0, path_1.join)(workspaceRoot, 'gen', android ? 'android' : ios ? 'ios' : '', 'app', 'build', 'outputs', 'apk', options.target, profile);
         const macOSExts = ['app', 'app.tar.gz', 'app.tar.gz.sig', 'dmg'];
         const linuxExts = [
             'AppImage',
@@ -156,11 +156,13 @@ function buildProject(options) {
             'msi.zip',
             'msi.zip.sig'
         ];
-        const artifactsLookupPattern = `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
-            ...macOSExts,
-            linuxExts,
-            windowsExts
-        ].join(',')}}`;
+        const artifactsLookupPattern = android
+            ? mobileBundleDir
+            : `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
+                ...macOSExts,
+                linuxExts,
+                windowsExts
+            ].join(',')}}`;
         core.debug(`Looking for artifacts using this pattern: ${artifactsLookupPattern}`);
         const artifacts = yield (0, tiny_glob_1.default)(artifactsLookupPattern, {
             absolute: true,

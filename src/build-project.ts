@@ -16,7 +16,7 @@ interface BuildOptions {
   debug?: boolean
   mobile?: string
   args?: string[]
-  target?: string
+  target: string
 }
 
 export async function buildProject(options: BuildOptions): Promise<string[]> {
@@ -97,7 +97,7 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'build',
     'outputs',
     'apk',
-    'arm64',
+    options.target,
     profile
   )
   const macOSExts = ['app', 'app.tar.gz', 'app.tar.gz.sig', 'dmg']
@@ -118,11 +118,13 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'msi.zip.sig'
   ]
 
-  const artifactsLookupPattern = `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
-    ...macOSExts,
-    linuxExts,
-    windowsExts
-  ].join(',')}}`
+  const artifactsLookupPattern = android
+    ? mobileBundleDir
+    : `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
+        ...macOSExts,
+        linuxExts,
+        windowsExts
+      ].join(',')}}`
 
   core.debug(
     `Looking for artifacts using this pattern: ${artifactsLookupPattern}`
