@@ -15,6 +15,7 @@ interface BuildOptions {
   configPath?: string
   debug?: boolean
   mobile?: string
+  portable?: boolean
   args?: string[]
   target: string
 }
@@ -89,6 +90,9 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   const desktopBundleDir = options.target
     ? join(targetDir, options.target, profile, 'bundle')
     : join(targetDir, profile, 'bundle')
+  const desktopPortableDir = options.target
+    ? join(targetDir, options.target, profile)
+    : join(targetDir, profile)
   const mobileBundleDir = join(
     workspaceRoot,
     'gen',
@@ -117,14 +121,13 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'msi.zip',
     'msi.zip.sig'
   ]
+  const desktopExts = [...macOSExts, linuxExts, windowsExts].join(',')
 
   const artifactsLookupPattern = android
     ? mobileBundleDir
-    : `${desktopBundleDir}/*/!(linuxdeploy)*.{${[
-        ...macOSExts,
-        linuxExts,
-        windowsExts
-      ].join(',')}}`
+    : options.portable
+      ? `${desktopPortableDir}/*/!(linuxdeploy)*.{${desktopExts}}`
+      : `${desktopBundleDir}/*/!(linuxdeploy)*.{${desktopExts}}`
 
   core.debug(
     `Looking for artifacts using this pattern: ${artifactsLookupPattern}`

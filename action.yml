@@ -14,6 +14,8 @@ inputs:
     description: 'Path to the tauri.conf.json file if you want a configuration different from the default one'
   mobile:
     description: "Enable mobile build (Android / IOS)"
+  portable:
+    description: "add portables binaries to output"
   target:
     description: 'The target triple to build against'
   debug:

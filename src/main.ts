@@ -11,6 +11,7 @@ async function run(): Promise<void> {
       configPath: core.getInput('configPath'),
       target: core.getInput('target'),
       mobile: core.getInput('mobile'),
+      portable: core.getBooleanInput('portable'),
       debug: core.getBooleanInput('debug')
     })
 
