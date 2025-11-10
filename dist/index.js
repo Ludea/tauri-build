@@ -163,7 +163,7 @@ function buildProject(options) {
         const artifactsLookupPattern = android
             ? mobileBundleDir
             : options.portable
-                ? `${desktopPortableDir}/*/!(linuxdeploy)*.{${desktopExts}}`
+                ? `${desktopPortableDir}/*/!(linuxdeploy)*.{${desktopExts}},${desktopBundleDir}/*/!(linuxdeploy)*.{${desktopExts}}`
                 : `${desktopBundleDir}/*/!(linuxdeploy)*.{${desktopExts}}`;
         core.debug(`Looking for artifacts using this pattern: ${artifactsLookupPattern}`);
         const artifacts = yield (0, tiny_glob_1.default)(artifactsLookupPattern, {

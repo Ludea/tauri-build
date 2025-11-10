@@ -126,7 +126,7 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
   const artifactsLookupPattern = android
     ? mobileBundleDir
     : options.portable
-      ? `${desktopPortableDir}/*/!(linuxdeploy)*.{${desktopExts}}`
+      ? `${desktopPortableDir}/*/!(linuxdeploy)*.{${desktopExts}},${desktopBundleDir}/*/!(linuxdeploy)*.{${desktopExts}}`
       : `${desktopBundleDir}/*/!(linuxdeploy)*.{${desktopExts}}`
 
   core.debug(
