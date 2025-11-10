@@ -19,7 +19,7 @@ interface BuildOptions {
 }
 
 export async function buildProject(options: BuildOptions): Promise<string[]> {
-  const args: string[] = options.args || []
+  const args: string[] = options.args ?? []
 
   if (options.debug) {
     args.push('--debug')
@@ -55,8 +55,21 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     ['metadata', '--no-deps', '--format-version', '1'],
     {cwd: crateDir}
   )
-  const meta = JSON.parse(metaRaw)
-  const targetDir = meta.target_directory
+
+  const meta: unknown = JSON.parse(metaRaw)
+
+let targetDir: string | undefined;
+
+if (
+  typeof meta === "object" &&
+  meta !== null &&
+  "target_directory" in meta &&
+  typeof (meta as { target_directory: unknown }).target_directory === "string"
+) {
+  targetDir = (meta as { target_directory: string }).target_directory;
+} else {
+  throw new Error("Invalid meta format");
+}
 
   const profile = options.debug ? 'debug' : 'release'
   const bundleDir = options.target
@@ -71,7 +84,14 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'deb',
     'rpm'
   ]
-  const windowsExts = ['exe', 'exe.zip', 'exe.zip.sig', 'msi', 'msi.zip', 'msi.zip.sig']
+  const windowsExts = [
+    'exe',
+    'exe.zip',
+    'exe.zip.sig',
+    'msi',
+    'msi.zip',
+    'msi.zip.sig'
+  ]
 
   const artifactsLookupPattern = `${bundleDir}/*/!(linuxdeploy)*.{${[
     ...macOSExts,
@@ -131,11 +151,9 @@ async function spawnCmd(
       reject(error)
     })
 
-    if (child.stdin) {
-      child.stdin.on('error', error => {
-        reject(error)
-      })
-    }
+    child.stdin.on('error', error => {
+      reject(error)
+    })
   })
 }
 
@@ -153,9 +171,10 @@ async function execCmd(
           console.error(
             `Failed to execute cmd ${cmd} with args: ${args.join(
               ' '
-            )}. reason: ${error}`
+            )}. reason: ${error.message}`
           )
-          reject(stderr)
+          const Rejecterror = new Error(stderr);
+          reject(Rejecterror)
         } else {
           resolve(stdout)
         }
