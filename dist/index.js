@@ -22,6 +22,13 @@ module.exports = require(__nccwpck_require__.ab + "cli.linux-x64-gnu.node")
 
 /***/ }),
 
+/***/ 531:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports = require(__nccwpck_require__.ab + "cli.linux-x64-musl.node")
+
+/***/ }),
+
 /***/ 1682:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -88,7 +95,8 @@ const core = __importStar(__nccwpck_require__(6966));
 const child_process_1 = __nccwpck_require__(7698);
 function buildProject(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const args = options.args || [];
+        var _a;
+        const args = (_a = options.args) !== null && _a !== void 0 ? _a : [];
         const android = (process.platform === 'linux' && options.mobile === 'true') ||
             options.mobile === 'android';
         const ios = process.platform === 'darwin' &&
@@ -132,8 +140,25 @@ function buildProject(options) {
         const crateDir = yield (0, tiny_glob_1.default)(`./**/Cargo.toml`).then(([manifest]) => (0, path_1.join)(process.cwd(), (0, path_1.dirname)(manifest)));
         const metaRaw = yield execCmd('cargo', ['metadata', '--no-deps', '--format-version', '1'], { cwd: crateDir });
         const meta = JSON.parse(metaRaw);
-        const targetDir = meta.target_directory;
-        const workspaceRoot = meta.workspace_root;
+        let targetDir;
+        let workspaceRoot;
+        if (typeof meta === 'object' &&
+            meta !== null &&
+            'target_directory' in meta &&
+            typeof meta.target_directory === 'string') {
+            targetDir = meta.target_directory;
+        }
+        else {
+            throw new Error('Invalid meta format');
+        }
+        if (typeof meta === 'object' &&
+            'workspace_root' in meta &&
+            typeof meta.workspace_root === 'string') {
+            workspaceRoot = meta.workspace_root;
+        }
+        else {
+            throw new Error('Invalid meta format');
+        }
         const profile = options.debug ? 'debug' : 'release';
         const desktopBundleDir = options.target
             ? (0, path_1.join)(targetDir, options.target, profile, 'bundle')
@@ -150,7 +175,6 @@ function buildProject(options) {
             'deb',
             'rpm'
         ];
-        const androidExts = ['apk'];
         const windowsExts = [
             'exe',
             'exe.zip',
@@ -200,11 +224,9 @@ function spawnCmd(cmd_1, args_1) {
             child.on('error', error => {
                 reject(error);
             });
-            if (child.stdin) {
-                child.stdin.on('error', error => {
-                    reject(error);
-                });
-            }
+            child.stdin.on('error', error => {
+                reject(error);
+            });
         });
     });
 }
@@ -213,8 +235,9 @@ function execCmd(cmd_1, args_1) {
         return new Promise((resolve, reject) => {
             (0, child_process_1.exec)(`${cmd} ${args.join(' ')}`, Object.assign(Object.assign({}, options), { encoding: 'utf-8' }), (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`Failed to execute cmd ${cmd} with args: ${args.join(' ')}. reason: ${error}`);
-                    reject(stderr);
+                    console.error(`Failed to execute cmd ${cmd} with args: ${args.join(' ')}. reason: ${error.message}`);
+                    const Rejecterror = new Error(stderr);
+                    reject(Rejecterror);
                 }
                 else {
                     resolve(stdout);
@@ -302,7 +325,10 @@ function run() {
         }
     });
 }
-run();
+run().catch((error) => {
+    if (error instanceof Error)
+        core.setFailed(error.message);
+});
 
 
 /***/ }),
@@ -3714,7 +3740,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return __nccwpck_require__(3751)
+          return __nccwpck_require__(531)
         } catch (e) {
           loadErrors.push(e)
         }
@@ -27163,14 +27189,6 @@ module.exports = eval("require")("@tauri-apps/cli-linux-riscv64-musl");
 /***/ ((module) => {
 
 module.exports = eval("require")("@tauri-apps/cli-linux-s390x-gnu");
-
-
-/***/ }),
-
-/***/ 3751:
-/***/ ((module) => {
-
-module.exports = eval("require")("@tauri-apps/cli-linux-x64-musl");
 
 
 /***/ }),

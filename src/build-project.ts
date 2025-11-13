@@ -85,18 +85,29 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
 
   const meta: unknown = JSON.parse(metaRaw)
 
-let targetDir: string | undefined;
+  let targetDir: string | undefined
+  let workspaceRoot: string | undefined
 
-if (
-  typeof meta === "object" &&
-  meta !== null &&
-  "target_directory" in meta &&
-  typeof (meta as { target_directory: unknown }).target_directory === "string"
-) {
-  targetDir = (meta as { target_directory: string }).target_directory;
-} else {
-  throw new Error("Invalid meta format");
-}
+  if (
+    typeof meta === 'object' &&
+    meta !== null &&
+    'target_directory' in meta &&
+    typeof (meta as {target_directory: unknown}).target_directory === 'string'
+  ) {
+    targetDir = (meta as {target_directory: string}).target_directory
+  } else {
+    throw new Error('Invalid meta format')
+  }
+
+  if (
+    typeof meta === 'object' &&
+    'workspace_root' in meta &&
+    typeof (meta as {workspace_root: unknown}).workspace_root === 'string'
+  ) {
+    workspaceRoot = (meta as {workspace_root: string}).workspace_root
+  } else {
+    throw new Error('Invalid meta format')
+  }
 
   const profile = options.debug ? 'debug' : 'release'
   const desktopBundleDir = options.target
@@ -132,6 +143,7 @@ if (
     'msi.zip',
     'msi.zip.sig'
   ]
+  const desktopExts = [...macOSExts, linuxExts, windowsExts].join(',')
 
   const artifactsLookupPattern = android
     ? mobileBundleDir
@@ -213,7 +225,7 @@ async function execCmd(
               ' '
             )}. reason: ${error.message}`
           )
-          const Rejecterror = new Error(stderr);
+          const Rejecterror = new Error(stderr)
           reject(Rejecterror)
         } else {
           resolve(stdout)
