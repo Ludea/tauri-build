@@ -21,7 +21,7 @@ interface BuildOptions {
 }
 
 export async function buildProject(options: BuildOptions): Promise<string[]> {
-  const args: string[] = options.args || []
+  const args: string[] = options.args ?? []
 
   const android =
     (process.platform === 'linux' && options.mobile === 'true') ||
@@ -82,9 +82,21 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     ['metadata', '--no-deps', '--format-version', '1'],
     {cwd: crateDir}
   )
-  const meta = JSON.parse(metaRaw)
-  const targetDir = meta.target_directory
-  const workspaceRoot = meta.workspace_root
+
+  const meta: unknown = JSON.parse(metaRaw)
+
+let targetDir: string | undefined;
+
+if (
+  typeof meta === "object" &&
+  meta !== null &&
+  "target_directory" in meta &&
+  typeof (meta as { target_directory: unknown }).target_directory === "string"
+) {
+  targetDir = (meta as { target_directory: string }).target_directory;
+} else {
+  throw new Error("Invalid meta format");
+}
 
   const profile = options.debug ? 'debug' : 'release'
   const desktopBundleDir = options.target
@@ -112,7 +124,6 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'deb',
     'rpm'
   ]
-  const androidExts = ['apk']
   const windowsExts = [
     'exe',
     'exe.zip',
@@ -121,7 +132,6 @@ export async function buildProject(options: BuildOptions): Promise<string[]> {
     'msi.zip',
     'msi.zip.sig'
   ]
-  const desktopExts = [...macOSExts, linuxExts, windowsExts].join(',')
 
   const artifactsLookupPattern = android
     ? mobileBundleDir
@@ -181,11 +191,9 @@ async function spawnCmd(
       reject(error)
     })
 
-    if (child.stdin) {
-      child.stdin.on('error', error => {
-        reject(error)
-      })
-    }
+    child.stdin.on('error', error => {
+      reject(error)
+    })
   })
 }
 
@@ -203,9 +211,10 @@ async function execCmd(
           console.error(
             `Failed to execute cmd ${cmd} with args: ${args.join(
               ' '
-            )}. reason: ${error}`
+            )}. reason: ${error.message}`
           )
-          reject(stderr)
+          const Rejecterror = new Error(stderr);
+          reject(Rejecterror)
         } else {
           resolve(stdout)
         }

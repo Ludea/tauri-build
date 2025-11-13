@@ -60,7 +60,7 @@ jobs:
 
 ### Bundling the app and creating a release
 
-Chances are you want to do *something* with the artifacts that you produced. The following action will produce artifacts for Windows, macOS and Linux upload them as workflow artifacts, so that a final job (called `publish`) can create a GitHub release and attach all prouced artifacts to it. This would also be the place where you could upload artifacts to an AWS Bucket or similar.
+Chances are you want to do _something_ with the artifacts that you produced. The following action will produce artifacts for Windows, macOS and Linux upload them as workflow artifacts, so that a final job (called `publish`) can create a GitHub release and attach all prouced artifacts to it. This would also be the place where you could upload artifacts to an AWS Bucket or similar.
 
 ```yaml
 name: 'publish'
@@ -164,40 +164,40 @@ jobs:
 
     runs-on: ${{ matrix.platform.os }}
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-    - name: 'Setup Rust'
-      uses: actions-rs/toolchain@v1
-      with:
-        default: true
-        override: true
-        profile: minimal
-        toolchain: stable
-        target: ${{ matrix.platform.rust_target }}
+      - name: 'Setup Rust'
+        uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          override: true
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.platform.rust_target }}
 
-    - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
 
-    - name: install dependencies (ubuntu only)
-      if: matrix.platform.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
 
-    - uses: JonasKruckenberg/tauri-build@v1.2.2
-      id: tauri_build
-      with:
-        target: ${{ matrix.platform.rust_target }}
+      - uses: JonasKruckenberg/tauri-build@v1.2.2
+        id: tauri_build
+        with:
+          target: ${{ matrix.platform.rust_target }}
 
-    # The artifacts output can now be used to upload the artifacts
-    - uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: "${{ join(fromJSON(steps.tauri_build.outputs.artifacts), '\n') }}"
+      # The artifacts output can now be used to upload the artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: "${{ join(fromJSON(steps.tauri_build.outputs.artifacts), '\n') }}"
 
   publish:
     needs: build-binaries
