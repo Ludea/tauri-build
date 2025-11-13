@@ -16,6 +16,7 @@ inputs:
     description: "Enable mobile build (Android / IOS)"
   portable:
     description: "add portables binaries to output"
+    default: false
   target:
     description: 'The target triple to build against'
   debug:
